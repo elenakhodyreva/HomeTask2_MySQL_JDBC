@@ -24,7 +24,7 @@ public class IndependentUserDAO {
     }
 
     public void save(User model) {
-
+        someUsersDao.save(model);
     }
 
     public void update(User model) {

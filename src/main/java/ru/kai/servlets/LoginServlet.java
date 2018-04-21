@@ -2,8 +2,8 @@ package ru.kai.servlets;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ru.kai.dao.*;
+import ru.kai.helpers.UserExistingChecker;
 import ru.kai.models.User;
 
 import javax.servlet.ServletException;
@@ -12,10 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
