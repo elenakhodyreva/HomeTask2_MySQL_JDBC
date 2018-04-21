@@ -69,5 +69,50 @@
     </form>
 </div>
 
+<div class="form-style-2">
+    <div class="form-style-2-heading">Редактировать данные о книге</div>
+    <form method="POST" action="/products" accept-charset="UTF-8">
+
+        <table>
+            <tr><td>Название книги</td><td><input type= "text" name="newBookName"  maxlength="50"
+                                                  required id="newBookName"/>
+            </td></tr>
+
+            <tr><td>Автор</td><td><input type= "text" name="newBookAuthor"  maxlength="50"
+                                         required id="newBookAuthor"/>
+            </td></tr>
+
+            <tr><td>Количество</td><td><input type= "text" pattern="\d*" name="newCount" maxlength="4"
+                                              required id="newCount"/>
+            </td></tr>
+
+            <tr><td>Стоимость, руб</td><td><input type= "text" pattern="\d*" name="newCost" maxlength="7"
+                                                  required id="newCost"/>
+            </td></tr>
+
+        </table>
+
+
+        </br></br>
+        <input type= 'submit' value= 'Редактировать'/>
+    </form>
+</div>
+
+<div class="form-style-2">
+    <div class="form-style-2-heading">Удалить книгу</div>
+    <form method="POST" action="/products" accept-charset="UTF-8">
+
+        <table>
+            <tr><td>ID</td><td><input type= "text" pattern="\d*" name="idForDelete" maxlength="4"
+                                              required id="idForDelete"/>
+            </td></tr>
+        </table>
+
+
+        </br></br>
+        <input type= 'submit' value= 'Удалить'/>
+    </form>
+</div>
+
 </body>
 </html>

@@ -3,7 +3,6 @@ package ru.kai.servlets;
 import org.hibernate.cfg.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ru.kai.dao.BooksDao;
-import ru.kai.dao.BooksDaoJDBCImpl;
 import ru.kai.dao.BooksHibernateDaoImpl;
 import ru.kai.models.Book;
 
@@ -37,11 +36,6 @@ public class ProductsServlet extends HttpServlet {
             String dbPassword = properties.getProperty("db.password");
             String driverClassName = properties.getProperty("db.driverClassName");
 
-            dataSource.setUrl(dbUrl);
-            dataSource.setUsername(dbUsername);
-            dataSource.setPassword(dbPassword);
-            dataSource.setDriverClassName(driverClassName);
-
             //hibernate
             configuration.setProperty("hibernate.connection.url", dbUrl);
             configuration.setProperty("hibernate.connection.username", dbUsername);
@@ -54,8 +48,7 @@ public class ProductsServlet extends HttpServlet {
             configuration.addAnnotatedClass(Book.class);
             configuration.setProperty("hibernate.show_sql", "true");
 
-            //здесь реализация для Hibernate но есть и для обычной JDBC
-            //booksDao = new BooksDaoJDBCImpl(dataSource);
+            //здесь реализация для Hibernate
             booksDao = new BooksHibernateDaoImpl(configuration);
 
         } catch (IOException e) {
@@ -78,8 +71,8 @@ public class ProductsServlet extends HttpServlet {
 
         if (req.getParameter("bookName") != null
                 && req.getParameter("bookAuthor") != null
-                && isNumeric(req.getParameter("bookCount"))
-                && isNumeric(req.getParameter("bookCost"))) {
+                && req.getParameter("bookCount") != null
+                && req.getParameter("bookCost") != null) {
 
             req.setCharacterEncoding("UTF-8");
             Book book = new Book();
@@ -95,17 +88,28 @@ public class ProductsServlet extends HttpServlet {
             booksDao.save(book);
             doGet(req, resp);
 
+        } else if (req.getParameter("newBookName") != null
+                && req.getParameter("newBookAuthor") != null
+                && req.getParameter("newCount") != null
+                && req.getParameter("newCost") != null) {
+
+            //сначала нашли книгу по имени
+            Book newBook = booksDao.findByFirstName(req.getParameter("newBookName"));
+
+            //затем отредактировали
+            if (newBook != null){
+                newBook.setCount(Integer.parseInt(req.getParameter("newCount")));
+                newBook.setCost(Integer.parseInt(req.getParameter("newCost")));
+                booksDao.update(newBook);
+            }
+
+            resp.sendRedirect("/products");
+
+        } else if (req.getParameter("idForDelete") != null) {
+            booksDao.delete(Integer.parseInt(req.getParameter("idForDelete")));
+            resp.sendRedirect("/products");
         } else {
             doGet(req, resp);
         }
-    }
-
-    private boolean isNumeric(String str) {
-        try {
-            Integer d = Integer.parseInt(str);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
     }
 }

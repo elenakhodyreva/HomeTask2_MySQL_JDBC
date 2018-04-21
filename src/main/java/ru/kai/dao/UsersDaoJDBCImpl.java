@@ -15,14 +15,7 @@ import java.util.Optional;
 public class UsersDaoJDBCImpl implements UsersDao {
 
     private Connection connection;
-
-    public UsersDaoJDBCImpl(DataSource dataSource) {
-        try {
-            this.connection = dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+    List<User> users;
 
     //language=SQL
     private final String SQL_SELECT_ALL =
@@ -40,9 +33,25 @@ public class UsersDaoJDBCImpl implements UsersDao {
     private final String SQL_INSERT_USER =
             "INSERT INTO fix_user (name, password, birthDate) VALUES (?, ?, ?)";
 
+    //language=SQL
+    private final String SQL_UPDATE_USER =
+            "UPDATE fix_user SET name=?, password=? WHERE id=?";
+
+    //language=SQL
+    private final String SQL_DELETE_USER =
+            "DELETE FROM fix_user WHERE id=?";
+
+    public UsersDaoJDBCImpl(DataSource dataSource) {
+        try {
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     @Override
     public List<User> findAllByFirstName(String firstName) {
-        List<User> users = new ArrayList<>();
+        users = new ArrayList<>();
         try {
             PreparedStatement statement = connection.prepareStatement(SQL_FIND_BY_NAME);
             statement.setString(1, firstName);
@@ -60,21 +69,6 @@ public class UsersDaoJDBCImpl implements UsersDao {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    @Override
-    public boolean ifExist(String name, String password) {
-        List<User> users = findAll();
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        //users = findAll();
-        for (User user : users) {
-            if (user.getName().equals(name)
-                    && passwordEncoder.matches(password, user.getPassword())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -100,8 +94,7 @@ public class UsersDaoJDBCImpl implements UsersDao {
     @Override
     public void save(User model) {
 
-        PreparedStatement preparedStatement =
-                null;
+        PreparedStatement preparedStatement;
         try {
             preparedStatement = connection.prepareStatement(SQL_INSERT_USER);
             preparedStatement.setString(1, model.getName());
@@ -118,18 +111,38 @@ public class UsersDaoJDBCImpl implements UsersDao {
     @Override
     public void update(User model) {
 
+        PreparedStatement preparedStatement;
+        try {
+            preparedStatement = connection.prepareStatement(SQL_UPDATE_USER);
+            preparedStatement.setString(1, model.getName());
+            preparedStatement.setString(2, model.getPassword());
+            preparedStatement.setInt(3, model.getId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public void delete(Integer id) {
 
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(SQL_DELETE_USER);
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public List<User> findAll() {
 
         try {
-            List<User> users = new ArrayList<>();
+            users = new ArrayList<>();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
             while (resultSet.next()) {
@@ -141,7 +154,6 @@ public class UsersDaoJDBCImpl implements UsersDao {
                 User user = new User(id, name, password, birthDate);
                 users.add(user);
             }
-
             return users;
         } catch (SQLException e) {
             throw new IllegalStateException(e);

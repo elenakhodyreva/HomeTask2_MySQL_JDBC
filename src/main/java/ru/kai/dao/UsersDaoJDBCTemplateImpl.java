@@ -27,6 +27,14 @@ public class UsersDaoJDBCTemplateImpl implements UsersDao {
     private final String SQL_INSERT_USER =
             "INSERT INTO fix_user (name, password, birthdate) VALUES (?, ?, ?)";
 
+    //language=SQL
+    private final String SQL_UPDATE_USER =
+            "UPDATE fix_user SET name=?, password=? WHERE id=?";
+
+    //language=SQL
+    private final String SQL_DELETE_USER =
+            "DELETE FROM fix_user WHERE id=?";
+
     public UsersDaoJDBCTemplateImpl(DataSource dataSource) {
         this.template = new JdbcTemplate(dataSource);
     }
@@ -47,20 +55,6 @@ public class UsersDaoJDBCTemplateImpl implements UsersDao {
     }
 
     @Override
-    public boolean ifExist(String name, String password) {
-        List<User> users = new ArrayList<>();
-        users = findAll();
-        for (User user : users) {
-
-            if (user.getName().equals(name)
-                    && user.getPassword().equals(password)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public Optional<User> find(Integer id) {
         return Optional.empty();
     }
@@ -77,11 +71,13 @@ public class UsersDaoJDBCTemplateImpl implements UsersDao {
     @Override
     public void update(User model) {
 
+        template.update(SQL_UPDATE_USER, model.getName(), model.getPassword(), model.getId());
     }
 
     @Override
     public void delete(Integer id) {
 
+        template.update(SQL_DELETE_USER, id);
     }
 
     @Override
