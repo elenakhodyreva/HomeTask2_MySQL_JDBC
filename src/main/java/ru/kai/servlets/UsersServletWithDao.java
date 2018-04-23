@@ -27,6 +27,9 @@ public class UsersServletWithDao extends HttpServlet {
     //private UsersDao usersDao;
     IndependentUserDAO usersDao;
     private PasswordEncoder passwordEncoder;
+    String hashedPassword;
+    User user;
+    List<User> users;
 
     @Override
     public void init() throws ServletException {
@@ -54,9 +57,9 @@ public class UsersServletWithDao extends HttpServlet {
 //            throw new IllegalStateException(e);
 //        }
 
-        passwordEncoder= new BCryptPasswordEncoder();
-        ApplicationContext context= new ClassPathXmlApplicationContext("ru.kai\\context.xml");
-        usersDao= context.getBean(IndependentUserDAO.class);
+        passwordEncoder = new BCryptPasswordEncoder();
+        ApplicationContext context = new ClassPathXmlApplicationContext("ru.kai\\context.xml");
+        usersDao = context.getBean(IndependentUserDAO.class);
     }
 
     @Override
@@ -64,7 +67,6 @@ public class UsersServletWithDao extends HttpServlet {
 
 //        Optional<User> user = usersDao.find(1);
 
-        List<User> users = null;
         if (req.getParameter("name") != null) {
             String name = req.getParameter("name");
             users = usersDao.findAllByFirstName(name);
@@ -78,18 +80,39 @@ public class UsersServletWithDao extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String name = req.getParameter("name");
-        String password = req.getParameter("password");
-        LocalDate birthDate = LocalDate.parse(req.getParameter("birthDate"));
-        String hashedPassword=passwordEncoder.encode(password);
 
-        //создаю объект user с зашифрованным паролем и сохраняю в таком виде в БД
-        User user = new User(name, hashedPassword, birthDate);
-        usersDao.save(user);
-        //использую redirect чтобы в теле request не сохранилось имя name
-        //иначе в повторном doGet вызовется findAllByFirstName
-        resp.sendRedirect("/users");
-        //doGet(req, resp);
+        if (req.getParameter("name") != null
+                && req.getParameter("password") != null
+                && req.getParameter("birthDate") != null) {
+
+            String name = req.getParameter("name");
+            String password = req.getParameter("password");
+            LocalDate birthDate = LocalDate.parse(req.getParameter("birthDate"));
+            hashedPassword = passwordEncoder.encode(password);
+
+            //создаю объект user с зашифрованным паролем и сохраняю в таком виде в БД
+            user = new User(name, hashedPassword, birthDate);
+            usersDao.save(user);
+            //использую redirect чтобы в теле request не сохранилось имя name
+            //иначе в повторном doGet вызовется findAllByFirstName
+            resp.sendRedirect("/users");
+
+        } else if (req.getParameter("newName") != null
+                && req.getParameter("newPassword") != null) {
+            hashedPassword = passwordEncoder.encode(req.getParameter("newPassword"));
+            users = usersDao.findAllByFirstName(req.getParameter("newName"));
+            if (users.size() != 0) {
+                user = users.get(0);
+                user.setPassword(hashedPassword);
+                usersDao.update(user);
+                resp.sendRedirect("/users");
+            }
+        } else if (req.getParameter("userIdDelete") != null) {
+            usersDao.delete(Integer.parseInt(req.getParameter("userIdDelete")));
+            resp.sendRedirect("/users");
+        } else {
+            doGet(req, resp);
+        }
     }
 }
 

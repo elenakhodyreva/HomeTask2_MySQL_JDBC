@@ -29,7 +29,7 @@ public class UsersDaoJDBCTemplateImpl implements UsersDao {
 
     //language=SQL
     private final String SQL_UPDATE_USER =
-            "UPDATE fix_user SET name=?, password=? WHERE id=?";
+            "UPDATE fix_user SET password=? WHERE name=?";
 
     //language=SQL
     private final String SQL_DELETE_USER =
@@ -71,7 +71,7 @@ public class UsersDaoJDBCTemplateImpl implements UsersDao {
     @Override
     public void update(User model) {
 
-        template.update(SQL_UPDATE_USER, model.getName(), model.getPassword(), model.getId());
+        template.update(SQL_UPDATE_USER, model.getPassword(), model.getName());
     }
 
     @Override

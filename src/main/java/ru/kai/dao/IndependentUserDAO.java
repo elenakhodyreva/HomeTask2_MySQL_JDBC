@@ -28,11 +28,11 @@ public class IndependentUserDAO {
     }
 
     public void update(User model) {
-
+        someUsersDao.update(model);
     }
 
     public void delete(Integer id) {
-
+        someUsersDao.delete(id);
     }
 
     public List<User> findAll() {

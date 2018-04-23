@@ -35,7 +35,7 @@ public class UsersDaoJDBCImpl implements UsersDao {
 
     //language=SQL
     private final String SQL_UPDATE_USER =
-            "UPDATE fix_user SET name=?, password=? WHERE id=?";
+            "UPDATE fix_user SET password=? WHERE name=?";
 
     //language=SQL
     private final String SQL_DELETE_USER =
@@ -114,9 +114,8 @@ public class UsersDaoJDBCImpl implements UsersDao {
         PreparedStatement preparedStatement;
         try {
             preparedStatement = connection.prepareStatement(SQL_UPDATE_USER);
-            preparedStatement.setString(1, model.getName());
-            preparedStatement.setString(2, model.getPassword());
-            preparedStatement.setInt(3, model.getId());
+            preparedStatement.setString(1, model.getPassword());
+            preparedStatement.setString(2, model.getName());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {

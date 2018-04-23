@@ -57,5 +57,39 @@
     </form>
 </div>
 
+<div class="form-style-2">
+    <div class="form-style-2-heading">Редактировать данные о пользователе</div>
+    <form method="POST" action="/users" accept-charset="UTF-8">
+
+        <table>
+            <tr><td>Логин</td><td><input type= "text" name="newName"  maxlength="50"
+                                                  required id="newName"/>
+            </td></tr>
+
+            <tr><td>Новый пароль</td><td><input type= "text" name="newPassword" maxlength="50"
+                                              required id="newPassword"/>
+            </td></tr>
+
+        </table>
+        </br></br>
+        <input type= 'submit' value= 'Редактировать'/>
+    </form>
+</div>
+
+<div class="form-style-2">
+    <div class="form-style-2-heading">Удалить пользователя</div>
+    <form method="POST" action="/users" accept-charset="UTF-8">
+
+        <table>
+            <tr><td>ID</td><td><input type= "text" pattern="\d*" name="userIdDelete" maxlength="4"
+                                      required id="userIdDelete"/>
+            </td></tr>
+        </table>
+
+        </br></br>
+        <input type= 'submit' value= 'Удалить'/>
+    </form>
+</div>
+
 </body>
 </html>

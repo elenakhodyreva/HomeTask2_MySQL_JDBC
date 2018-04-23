@@ -89,14 +89,13 @@ public class ProductsServlet extends HttpServlet {
             doGet(req, resp);
 
         } else if (req.getParameter("newBookName") != null
-                && req.getParameter("newBookAuthor") != null
-                && req.getParameter("newCount") != null
-                && req.getParameter("newCost") != null) {
+                    && req.getParameter("newCount") != null
+                    && req.getParameter("newCost") != null) {
 
-            //сначала нашли книгу по имени
+            //сначала найти книгу по имени
             Book newBook = booksDao.findByFirstName(req.getParameter("newBookName"));
 
-            //затем отредактировали
+            //затем отредактировать
             if (newBook != null){
                 newBook.setCount(Integer.parseInt(req.getParameter("newCount")));
                 newBook.setCost(Integer.parseInt(req.getParameter("newCost")));
